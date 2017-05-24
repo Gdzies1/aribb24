@@ -24,7 +24,6 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <fcntl.h>
 #include <math.h>
 #include <ctype.h>
@@ -64,6 +63,31 @@
 #   define S_IWOTH 0
 #   define S_IXOTH 0
 #   define S_IRWXO (S_IROTH | S_IWOTH | S_IXOTH)
+#endif
+
+#ifdef WIN32
+#include <io.h>
+#include <stdarg.h>
+#include <direct.h>
+int asprintf(char **strp, char* format, ...)
+{
+	if(!format) return 0;
+
+	va_list args; 
+	va_start(args,format); 
+	int size = _vscprintf(format, args); 
+	
+	if(size > 0){
+		int newsize = size++; //for null
+		*strp = (char*)malloc(newsize+2);
+		*strp ? _vsnprintf(*strp, newsize, format, args) : size = -1;
+	}
+
+	va_end(args);
+	return size;
+}
+#else
+#include <unistd.h>
 #endif
 
 static char* get_arib_data_dir( arib_instance_t *p_instance )
@@ -271,7 +295,12 @@ static FILE* open_image_file( arib_instance_t* p_instance, const char *psz_hash 
 #if defined( _WIN32 ) || defined( __SYMBIAN32__ ) || defined( __OS2__ )
     flags |= O_BINARY;
 #endif
-    int mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
+#if defined _WIN32
+	int mode = _S_IREAD | _S_IWRITE | S_IRGRP | S_IROTH;
+#else
+	int mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
+#endif
+	
     int fd = open( psz_image_file, flags, mode );
     if ( fd != -1 )
     {
@@ -292,7 +321,7 @@ static char* get_drcs_pattern_data_hash(
         int i_width, int i_height,
         int i_depth, const int8_t* p_patternData )
 {
-    int i_bits_per_pixel = ceil( sqrt( ( i_depth ) ) );
+    int i_bits_per_pixel = ceil( sqrt( (double)( i_depth ) ) );
     struct md5_s md5;
     InitMD5( &md5 );
     AddMD5( &md5, p_patternData, i_width * i_height * i_bits_per_pixel / 8 );

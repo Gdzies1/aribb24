@@ -1529,7 +1529,7 @@ size_t arib_decode_buffer( arib_decoder_t* decoder,
 
 arib_decoder_t * arib_decoder_new( arib_instance_t *p_instance )
 {
-    arib_decoder_t *p_decoder = calloc( 1, sizeof( *p_decoder ) );
+    arib_decoder_t *p_decoder = (arib_decoder_t *)calloc( 1, sizeof( *p_decoder ) );
     if ( !p_decoder )
         return NULL;
     p_decoder->p_instance = p_instance;

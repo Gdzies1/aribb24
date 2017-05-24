@@ -23,7 +23,9 @@
 #ifndef ARIBB24_MAIN_H
 #define ARIBB24_MAIN_H 1
 
+#ifndef _WIN32
 #include <stdbool.h>
+#endif
 
 /* If building or using aribb24 as a DLL, define ARIBB24_DLL.
  */

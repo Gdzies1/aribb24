@@ -62,10 +62,10 @@ void arib_log( arib_instance_t *p_instance, const char *psz_format, ... )
 
 arib_instance_t * arib_instance_new( void *p_opaque )
 {
-    arib_instance_t *p_instance = calloc( 1, sizeof(*p_instance) );
+    arib_instance_t *p_instance = (arib_instance_t *)calloc( 1, sizeof(*p_instance) );
     if ( !p_instance )
         return NULL;
-    p_instance->p = calloc( 1, sizeof(*(p_instance->p)) );
+    p_instance->p = (arib_instance_private_t*)calloc( 1, sizeof(*(p_instance->p)) );
     if (!p_instance->p)
     {
         free( p_instance );

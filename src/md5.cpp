@@ -46,11 +46,16 @@ typedef uint8_t byte;
 
 typedef struct md5_s MD5_CONTEXT;
 
+#if defined _WIN32
+#define _RESTRICT __restrict
+#else
+#define _RESTRICT restrict
+#endif
 
 static void
 md5_init( void *context )
 {
-  MD5_CONTEXT *ctx = context;
+  MD5_CONTEXT *ctx = (MD5_CONTEXT*)context;
 
   ctx->A = 0x67452301;
   ctx->B = 0xefcdab89;
@@ -215,8 +220,8 @@ transform ( MD5_CONTEXT *ctx, const unsigned char *data )
 static void
 md5_write( void *context, const void *inbuf_arg , size_t inlen)
 {
-  const unsigned char *inbuf = inbuf_arg;
-  MD5_CONTEXT *hd = context;
+  const unsigned char *inbuf = (const unsigned char *)inbuf_arg;
+  MD5_CONTEXT *hd = (MD5_CONTEXT*)context;
 
   if( hd->count == 64 )  /* flush the buffer */
     {
@@ -260,7 +265,7 @@ md5_write( void *context, const void *inbuf_arg , size_t inlen)
 static void
 md5_final( void *context)
 {
-  MD5_CONTEXT *hd = context;
+  MD5_CONTEXT *hd = (MD5_CONTEXT*)context;
   u32 t, msb, lsb;
   byte *p;
 
@@ -334,7 +339,7 @@ void InitMD5( struct md5_s *h )
     md5_init( h );
 }
 
-void AddMD5( struct md5_s *restrict h, const void *data, size_t len )
+void AddMD5( struct md5_s *_RESTRICT h, const void *data, size_t len )
 {
     md5_write( h, data, len );
 }

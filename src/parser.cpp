@@ -162,7 +162,7 @@ static void parse_data_unit_DRCS( arib_parser_t *p_parser, bs_t *p_bs,
                 uint8_t i_height = bs_read( p_bs, 8 );
                 p_parser->i_data_unit_size += 1;
 
-                int i_bits_per_pixel = ceil( sqrt( ( i_depth + 2 ) ) );
+                int i_bits_per_pixel = ceil( sqrt( (double)( i_depth + 2 ) ) );
 
 #ifdef ARIBSUB_GEN_DRCS_DATA
                 drcs_pattern_data_t* p_drcs_pattern_data =
@@ -438,7 +438,7 @@ void arib_parse_pes( arib_parser_t *p_parser, const void *p_data, size_t i_data 
 
 arib_parser_t * arib_parser_new( arib_instance_t *p_instance )
 {
-    arib_parser_t *p_parser = calloc( 1, sizeof(*p_parser) );
+    arib_parser_t *p_parser = (arib_parser_t*)calloc( 1, sizeof(*p_parser) );
     if ( !p_parser )
        return NULL;
     p_parser->p_instance = p_instance;
