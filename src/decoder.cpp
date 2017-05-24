@@ -74,6 +74,7 @@ struct arib_decoder_t
     size_t count;
     char *ubuf;
     size_t ucount;
+	bool *cs;
     int (**handle_gl)(arib_decoder_t *, int);
     int (**handle_gl_single)(arib_decoder_t *, int);
     int (**handle_gr)(arib_decoder_t *, int);
@@ -708,6 +709,10 @@ static int decoder_handle_c0( arib_decoder_t *decoder, int c )
             decoder->i_charleft = decoder->i_left;
             decoder->i_charbottom = decoder->i_top + decoder->i_charheight - 1;
             decoder_adjust_position( decoder );
+			if (decoder->cs)
+			{
+				*decoder->cs = true;
+			}
             return 1;
         case 0x0d: //APR
             decoder->i_charleft = decoder->i_left;
@@ -1510,12 +1515,18 @@ void arib_finalize_decoder( arib_decoder_t* decoder )
 
 size_t arib_decode_buffer( arib_decoder_t* decoder,
                            const unsigned char *buf, size_t count,
-                           char *ubuf, size_t ucount )
+                           char *ubuf, size_t ucount, bool *cs )
 {
     decoder->buf = buf;
     decoder->count = count;
     decoder->ubuf = ubuf;
     decoder->ucount = ucount;
+	decoder->cs = cs;
+
+	if (cs)
+	{
+		*cs = false;
+	}
 
     if( arib_decode( decoder ) == 0 )
     {
